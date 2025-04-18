@@ -47,10 +47,9 @@ app.patch("/files/*", async (req, res) => {
 
 // Delete
 app.delete("/files/*", async (req, res) => {
-  const { 0: filename } = req.params;
-  const filePath = `./storage/${filename}`;
+  const { 0: filePath } = req.params;
   try {
-    await rm(filePath);
+    await rm(`./storage/${filePath}`, {recursive: true});
     res.json({ message: "File Deleted Successfully" });
   } catch (err) {
     res.status(404).json({ message: "File Not Found!" });
