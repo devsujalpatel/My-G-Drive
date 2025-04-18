@@ -40,6 +40,8 @@ app.post("/files/*", (req, res) => {
   });
 });
 
+// path travarsal vulnerbility
+
 app.get("/files/*", (req, res) => {
   const { 0: filePath } = req.params;
   if (req.query.action === "download") {
