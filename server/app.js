@@ -9,8 +9,8 @@ app.use(express.json());
 app.use(cors());
 
 // Read
-app.get("/directory/:dirname?", async (req, res) => {
-  const { dirname } = req.params;
+app.get("/directory/?*", async (req, res) => {
+  const { 0: dirname } = req.params;
   const fullDirPath = `./storage/${dirname ? dirname : ""}`;
   const filesList = await readdir(fullDirPath);
   const resData = [];
@@ -22,32 +22,32 @@ app.get("/directory/:dirname?", async (req, res) => {
 });
 
 // Create
-app.post("/files/:filename", (req, res) => {
-  const writeStream = createWriteStream(`./storage/${req.params.filename}`);
+app.post("/files/*", (req, res) => {
+  const writeStream = createWriteStream(`./storage/${req.params[0]}`);
   req.pipe(writeStream);
   req.on("end", () => {
     res.json({ message: "File Uploaded" });
   });
 });
 
-app.get("/files/:filename", (req, res) => {
-  const { filename } = req.params;
+app.get("/files/*", (req, res) => {
+  const { 0: filePath } = req.params;
   if (req.query.action === "download") {
     res.set("Content-Disposition", "attachment");
   }
-  res.sendFile(`${import.meta.dirname}/storage/${filename}`);
+  res.sendFile(`${import.meta.dirname}/storage/${filePath}`);
 });
 
 // Update
-app.patch("/files/:filename", async (req, res) => {
-  const { filename } = req.params;
-  await rename(`./storage/${filename}`, `./storage/${req.body.newFilename}`);
+app.patch("/files/*", async (req, res) => {
+  const { 0: filePath  } = req.params;
+  await rename(`./storage/${filePath}`, `./storage/${req.body.newFilename}`);
   res.json({ message: "Renamed" });
 });
 
 // Delete
-app.delete("/files/:filename", async (req, res) => {
-  const { filename } = req.params;
+app.delete("/files/*", async (req, res) => {
+  const { 0: filename } = req.params;
   const filePath = `./storage/${filename}`;
   try {
     await rm(filePath);
