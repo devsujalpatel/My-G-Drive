@@ -4,7 +4,7 @@ import { createDir, readDirectory } from "../controller/directory.controller.js"
 const router = express.Router()
 
 
-router.get("/?*", readDirectory);
-router.post("/*", createDir);
+router.get("/:id?", readDirectory);
+router.post("/:id", createDir);
 
 export default router

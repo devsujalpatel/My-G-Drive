@@ -2,9 +2,9 @@ import { createWriteStream } from "fs";
 import { rename, rm, writeFile } from "fs/promises";
 import path from "path";
 import filesData from "../filesDB.json" with {type: "json"};
+import foldersData from '../folderDB.json' with { type: "json"};
 
 // Create
-
 export const uploadFile = async (req, res) => {
   const { filename } = req.params;
   const extension = path.extname(filename);
@@ -23,6 +23,7 @@ export const uploadFile = async (req, res) => {
   });
 };
 
+// Read
 export const openFile = async (req, res) => {
   const {id} = req.params;
   const fileData = filesData.find((file) => file.id === id)
@@ -37,7 +38,6 @@ export const openFile = async (req, res) => {
 };
 
 // Update
-
 export const renameFile = async (req, res) => {
   const {id} = req.params;
   const fileData = filesData.find((file) => file.id === id)
@@ -47,15 +47,17 @@ export const renameFile = async (req, res) => {
 };
 
 // Delete
-
 export const deleteFile = async (req, res) => {
   const {id} = req.params;
   const fileIndex = filesData.findIndex((file) => file.id === id)
   const fileData = filesData[fileIndex]
   try {
     await rm(`./storage/${id}${fileData.extension}`, { recursive: true });
-    filesData.splice(fileIndex)
+    filesData.splice(fileIndex, 1)
+    const parentDirData = foldersData.find((folderData) => folderData.id === fileData.parentDirId)
+    parentDirData.files = parentDirData.files.filter((fileId) => fileId !== id)
     writeFile('./filesDB.json', JSON.stringify(filesData))
+    writeFile('./folderDB.json', JSON.stringify(foldersData))
     res.json({ message: "File Deleted Successfully" });
   } catch (err) {
     res.status(404).json({ message: "File Not Found!" });

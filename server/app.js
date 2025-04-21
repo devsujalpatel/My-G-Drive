@@ -12,7 +12,7 @@ import fileRoutes from "./routes/file.routes.js"
 import dirRoutes from "./routes/directory.routes.js"
 
 app.use("/file", fileRoutes)
-app.use("/directory", dirRoutes)
+app.use("/folder", dirRoutes)
 
 
 app.listen(4000, () => {
