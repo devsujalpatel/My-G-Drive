@@ -39,17 +39,23 @@ export const openFile = async (req, res) => {
 // Update
 
 export const renameFile = async (req, res) => {
-  const filePath = path.join("/", req.params[0]);
-  await rename(`./storage/${filePath}`, `./storage/${req.body.newFilename}`);
+  const {id} = req.params;
+  const fileData = filesData.find((file) => file.id === id)
+  fileData.name = req.body.newFilename
+  writeFile('./filesDB.json', JSON.stringify(filesData))
   res.json({ message: "Renamed" });
 };
 
 // Delete
 
 export const deleteFile = async (req, res) => {
-  const filePath = path.join("/", req.params[0]);
+  const {id} = req.params;
+  const fileIndex = filesData.findIndex((file) => file.id === id)
+  const fileData = filesData[fileIndex]
   try {
-    await rm(`./storage/${filePath}`, { recursive: true });
+    await rm(`./storage/${id}${fileData.extension}`, { recursive: true });
+    filesData.splice(fileIndex)
+    writeFile('./filesDB.json', JSON.stringify(filesData))
     res.json({ message: "File Deleted Successfully" });
   } catch (err) {
     res.status(404).json({ message: "File Not Found!" });

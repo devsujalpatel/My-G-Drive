@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.post("/:filename", uploadFile)
 router.get("/:id", openFile);
-router.patch("/*", renameFile);
-router.delete("/*", deleteFile);
+router.patch("/:id", renameFile);
+router.delete("/:id", deleteFile);
 
 export default router
