@@ -3,8 +3,8 @@ import { uploadFile, openFile, renameFile, deleteFile } from "../controller/file
 
 const router = express.Router()
 
-router.post("/*", uploadFile)
-router.get("/*", openFile);
+router.post("/:filename", uploadFile)
+router.get("/:id", openFile);
 router.patch("/*", renameFile);
 router.delete("/*", deleteFile);
 

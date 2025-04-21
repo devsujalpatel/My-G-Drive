@@ -11,7 +11,7 @@ app.use(cors());
 import fileRoutes from "./routes/file.routes.js"
 import dirRoutes from "./routes/directory.routes.js"
 
-app.use("/files", fileRoutes)
+app.use("/file", fileRoutes)
 app.use("/directory", dirRoutes)
 
 
