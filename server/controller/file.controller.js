@@ -7,6 +7,7 @@ import foldersData from '../folderDB.json' with { type: "json"};
 // Create
 export const uploadFile = async (req, res) => {
   const { filename } = req.params;
+  const  parentDirId = req.headers.parentdirid || foldersData[0].id;
   const extension = path.extname(filename);
   const id = crypto.randomUUID();
   const fullFileName = `${id}${extension}`;
@@ -16,9 +17,13 @@ export const uploadFile = async (req, res) => {
     filesData.push({
       id,
       extension,
-      name: filename
+      name: filename,
+      parentDirId
     })
+    const parentDirData = foldersData.find((folderData) => folderData.id === parentDirId)
+    parentDirData.files.push(id)
     writeFile('./filesDB.json', JSON.stringify(filesData))
+    writeFile('./folderDB.json', JSON.stringify(foldersData))
     res.json({ message: "File Uploaded" });
   });
 };

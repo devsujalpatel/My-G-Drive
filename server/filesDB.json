@@ -1,7 +1,1 @@
-[
-  {
-    "id": "0a974735-b1bb-4c5d-aaaa-da5c1f683505",
-    "extension": ".js",
-    "name": "test.js"
-  }
-]
+[{"id":"1d27810d-bf74-4474-be44-f588dc583431","extension":".txt","name":"tesxt.txt","parentDirId":"3cded8e0-78a3-4191-97c8-3f3e775e5200"},{"id":"d00067fd-8d0c-4ec8-b07b-2e134f643c04","extension":".js","name":"test.js","parentDirId":"3cded8e0-78a3-4191-97c8-3f3e775e5200"}]
