@@ -52,7 +52,7 @@ function DirectoryView() {
     setNewFilename(oldFilename);
   }
 
-  async function saveFilename(fileId) {np
+  async function saveFilename(fileId) {
     const response = await fetch(`${BASE_URL}/file/${fileId}`, {
       method: "PATCH",
       headers: {
