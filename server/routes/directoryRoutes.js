@@ -40,4 +40,21 @@ router.post("/:parentDirId?", async (req, res) => {
   }
 });
 
+router.patch('/:id', async (req, res) => {
+  const {id} = req.params
+  const {newDirName} = req.body
+  const dirData = directoriesData.find((dir) => dir.id === id)
+  dirData.name = newDirName
+  try {
+    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
+    res.status(200).json({message: "Folder renamed"})
+  } catch (error) {
+    res.status(404).json({ err: err.message });
+  }
+})
+
+router.delete('/:id', async (req, res) => {
+  const {id} = req.params
+})
+
 export default router;
