@@ -9,10 +9,10 @@ function DirectoryView() {
   const [progress, setProgress] = useState(0);
   const [newFilename, setNewFilename] = useState("");
   const [newDirname, setNewDirname] = useState("");
-  const { "*": dirPath } = useParams();
+  const { dirId } = useParams();
 
   async function getDirectoryItems() {
-    const response = await fetch(`${BASE_URL}/directory/${dirPath}`);
+    const response = await fetch(`${BASE_URL}/directory/${dirId || ""}`);
     const data = await response.json();
     // setDirectoryItems(data);
     setDirectoriesList(data.directories);
@@ -20,13 +20,13 @@ function DirectoryView() {
   }
   useEffect(() => {
     getDirectoryItems();
-  }, [dirPath]);
+  }, [dirId]);
 
   async function uploadFile(e) {
     const file = e.target.files[0];
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${BASE_URL}/file/${file.name}`, true);
-    // xhr.setRequestHeader("parentdirid", null)
+    xhr.open("POST", `${BASE_URL}/file/${dirId || ""}`, true);
+    xhr.setRequestHeader("filename", file.name);
     xhr.addEventListener("load", () => {
       console.log(xhr.response);
       getDirectoryItems();
@@ -68,11 +68,12 @@ function DirectoryView() {
 
   async function handleCreateDirectory(e) {
     e.preventDefault();
-    const url = `${BASE_URL}/directory${
-      dirPath ? "/" + dirPath : ""
-    }/${newDirname}`;
+    const url = `${BASE_URL}/directory/${dirId || ""}`;
     const response = await fetch(url, {
       method: "POST",
+      headers: {
+        dirname: newDirname,
+      },
     });
     const data = await response.json();
     console.log(data);
@@ -98,6 +99,21 @@ function DirectoryView() {
         />
         <button>Create Folder</button>
       </form>
+      {directoriesList.map(({ name, id }) => (
+        <div key={id}>
+          {name} <Link to={`/directory/${id}`}>Open</Link>{" "}
+          <button onClick={() => renameFile(name)}>Rename</button>
+          <button onClick={() => saveFilename(id)}>Save</button>
+          <button
+            onClick={() => {
+              handleDelete(id);
+            }}
+          >
+            Delete
+          </button>
+          <br />
+        </div>
+      ))}
       {filesList.map(({ name, id }) => (
         <div key={id}>
           {name} <a href={`${BASE_URL}/file/${id}`}>Open</a>{" "}
