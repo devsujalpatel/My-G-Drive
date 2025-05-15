@@ -47,7 +47,17 @@ function DirectoryView() {
     getDirectoryItems();
   }
 
+  async function handleDeleteDir(dirID) {
+    const response = await fetch(`${BASE_URL}/directory/${dirID}`, {
+      method: "DELETE",
+    });
+    const data = await response.json();
+    console.log(data);
+    getDirectoryItems();
+  }
+
   async function renameFile(oldFilename) {
+    console.log({ oldFilename, newFilename });
     setNewFilename(oldFilename);
   }
 
@@ -64,6 +74,7 @@ function DirectoryView() {
     setNewFilename("");
     getDirectoryItems();
   }
+
   async function saveDir(dirId) {
     const response = await fetch(`${BASE_URL}/directory/${dirId}`, {
       method: "PATCH",
@@ -93,13 +104,17 @@ function DirectoryView() {
     getDirectoryItems();
   }
 
+  const handleInputChange = (e) => {
+    setNewFilename(e.target.value)
+  }
+
   return (
     <>
       <h1>My Files</h1>
       <input type="file" onChange={uploadFile} />
       <input
         type="text"
-        onChange={(e) => setNewFilename(e.target.value)}
+        onChange={handleInputChange}
         value={newFilename}
       />
       <p>Progress: {progress}%</p>
@@ -118,7 +133,7 @@ function DirectoryView() {
           <button onClick={() => saveDir(id)}>Save</button>
           <button
             onClick={() => {
-              handleDelete(id);
+              handleDeleteDir(id);
             }}
           >
             Delete

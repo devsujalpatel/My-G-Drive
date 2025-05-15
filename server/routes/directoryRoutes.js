@@ -1,5 +1,5 @@
 import express from "express";
-import { mkdir, readdir, stat, writeFile } from "fs/promises";
+import { mkdir, readdir, rm, stat, writeFile } from "fs/promises";
 import path from "path";
 import directoriesData from '../directoriesDB.json' with {type: "json"}
 import filesData from '../filesDB.json' with {type: "json"}
@@ -22,6 +22,9 @@ router.get("/:id?", async (req, res) => {
 router.post("/:parentDirId?", async (req, res) => {
   const parentDirId = req.params.parentDirId || directoriesData[0].id
   const { dirname } = req.headers
+ if (!dirname || dirname.trim().length === 0) {
+  return res.status(400).json({ message: "Directory name cannot be empty" });
+}
   const id = crypto.randomUUID()
   const parentDir = directoriesData.find((dir) => dir.id === parentDirId)
   parentDir.directories.push(id)
@@ -45,16 +48,35 @@ router.patch('/:id', async (req, res) => {
   const {newDirName} = req.body
   const dirData = directoriesData.find((dir) => dir.id === id)
   dirData.name = newDirName
-  try {
-    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
-    res.status(200).json({message: "Folder renamed"})
-  } catch (error) {
-    res.status(404).json({ err: err.message });
-  }
+  await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
+  res.json({message: "Directory Renamed!"})
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const {id} = req.params
-})
+  try {
+    const dirIndex = directoriesData.findIndex((directory) => directory.id === id)
+    const directoryData = directoriesData[dirIndex]
+    directoriesData.splice(dirIndex, 1)
+    for await (const fileId of directoryData.files) {
+      const fileIndex = filesData.findIndex((file) => file.id === fileId)
+      const fileData = filesData[fileIndex]
+      await rm(`./storage/${fileId}${fileData.extension}`);
+      filesData.splice(fileIndex, 1)
+    }
+    for await (const dirId of directoryData.directories) {
+      const dirIndex = directoriesData.findIndex(({id}) => id === dirId)
+      directoriesData.splice(dirIndex, 1)
+    }
+    const parentDirData = directoriesData.find((dirData) => dirData.id === directoryData.parentDirId)
+    parentDirData.directories = parentDirData.directories.filter((dirId) => dirId !== id)
+    await writeFile('./filesDB.json', JSON.stringify(filesData))
+    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
+    res.json({ message: "Directory Deleted!" });
+  } catch (err) {
+    console.log(err);
+    res.json({ err: err.message });
+  }
+});
 
 export default router;
